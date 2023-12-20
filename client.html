@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Page</title>
+    <title>Client Page</title>
 </head>
 <body>
 
-<h1>Search for Household Goods</h1>
+<h1>Client Page</h1>
 
+<!-- Your search form goes here -->
 <label for="searchInput">Search:</label>
 <input type="text" id="searchInput" placeholder="Enter search term">
 <button onclick="searchGoods()">Search</button>
 
+<!-- Container to display search results -->
 <div id="searchResults"></div>
+
+<!-- Container to display detail.html content -->
+<div id="detailContainer"></div>
 
 <script>
     function searchGoods() {
-        // Get the search input value
         var searchParam = document.getElementById("searchInput").value;
 
         // Make a fetch request to searchdata.php with the search parameter
@@ -35,33 +39,53 @@
 
     function displaySearchResults(results) {
         var resultsContainer = document.getElementById("searchResults");
-        resultsContainer.innerHTML = ""; // Clear previous results
+        resultsContainer.innerHTML = "";
 
-        if (results.length > 0) {
-            // Create a table to display the results
-            var table = document.createElement("table");
-            table.border = "1";
-
-            // Create header row
-            var headerRow = table.insertRow(0);
-            for (var key in results[0]) {
-                var headerCell = headerRow.insertCell(-1);
-                headerCell.textContent = key;
-            }
-
-            // Create data rows
-            for (var i = 0; i < results.length; i++) {
-                var dataRow = table.insertRow(-1);
-                for (var key in results[i]) {
-                    var dataCell = dataRow.insertCell(-1);
-                    dataCell.textContent = results[i][key];
-                }
-            }
-
-            resultsContainer.appendChild(table);
+        if (results.status === 'success') {
+            // Iterate through results and display
+            results.data.forEach(result => {
+                var resultItem = document.createElement("div");
+                resultItem.innerHTML = `<p>${result.name}</p>`;
+                resultItem.onclick = function () {
+                    showDetail(result.id);
+                };
+                resultsContainer.appendChild(resultItem);
+            });
         } else {
             resultsContainer.textContent = "No results found.";
         }
+    }
+
+    function showDetail(rowRecordNumber) {
+        // Make a fetch request to detail.php with the row record number
+        fetch('detail.php?row=' + encodeURIComponent(rowRecordNumber))
+            .then(response => response.json())
+            .then(data => {
+                // Process the data and display on the page
+                if (data.status === 'success') {
+                    displayDetail(data.data);
+                } else {
+                    console.error('Error:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function displayDetail(detail) {
+        var detailContainer = document.getElementById("detailContainer");
+        detailContainer.innerHTML = "";
+
+        // Create HTML content to display the detail
+        var detailContent = document.createElement("div");
+        detailContent.innerHTML = `<p><strong>Name:</strong> ${detail[0].name}</p>
+                                   <p><strong>Description:</strong> ${detail[0].description}</p>
+                                   <p><strong>Category:</strong> ${detail[0].category}</p>
+                                   <p><strong>Price:</strong> ${detail[0].price}</p>
+                                   <p><strong>Quantity:</strong> ${detail[0].quantity}</p>`;
+
+        detailContainer.appendChild(detailContent);
     }
 </script>
 
