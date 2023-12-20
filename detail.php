@@ -1,9 +1,9 @@
 <?php
 
 // Include your database connection logic here
-$servername = "your_server_name";
-$username = "your_username";
-$password = "your_password";
+$servername = "localhost";
+$username = "Munkh";
+$password = "12345678";
 $dbname = "household_goods_db";
 
 // Create connection
