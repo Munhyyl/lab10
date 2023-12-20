@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+</head>
+<body>
+
+<h1>Search for Household Goods</h1>
+
+<label for="searchInput">Search:</label>
+<input type="text" id="searchInput" placeholder="Enter search term">
+<button onclick="searchGoods()">Search</button>
+
+<div id="searchResults"></div>
+
+<script>
+    function searchGoods() {
+        // Get the search input value
+        var searchParam = document.getElementById("searchInput").value;
+
+        // Make a fetch request to searchdata.php with the search parameter
+        fetch('searchdata.php?search=' + encodeURIComponent(searchParam))
+            .then(response => response.json())
+            .then(data => {
+                // Process the data and display on the page
+                displaySearchResults(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors
+            });
+    }
+
+    function displaySearchResults(results) {
+        var resultsContainer = document.getElementById("searchResults");
+        resultsContainer.innerHTML = ""; // Clear previous results
+
+        if (results.length > 0) {
+            // Create a table to display the results
+            var table = document.createElement("table");
+            table.border = "1";
+
+            // Create header row
+            var headerRow = table.insertRow(0);
+            for (var key in results[0]) {
+                var headerCell = headerRow.insertCell(-1);
+                headerCell.textContent = key;
+            }
+
+            // Create data rows
+            for (var i = 0; i < results.length; i++) {
+                var dataRow = table.insertRow(-1);
+                for (var key in results[i]) {
+                    var dataCell = dataRow.insertCell(-1);
+                    dataCell.textContent = results[i][key];
+                }
+            }
+
+            resultsContainer.appendChild(table);
+        } else {
+            resultsContainer.textContent = "No results found.";
+        }
+    }
+</script>
+
+</body>
+</html>
